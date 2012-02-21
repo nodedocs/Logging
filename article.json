@@ -9,5 +9,8 @@
       "url": "https://github.com/jesusabdullah"
     }
   ],
-  "difficulty": 2
+  "difficulty": 4,
+  "categories": [
+    ["Debugging"]
+  ]
 }
