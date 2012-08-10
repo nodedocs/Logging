@@ -6,7 +6,9 @@ Many processes, including most servers, write logs in one form or another. Reaso
 
 The simplest form of logging involves simply using `console.log` or one of the other standard output methods. In this approach, any information is printed to `stdout` where it can either be read by the developer as it occurs, or, for example, redirected to a log file. 
 
-    console.log('Web Server started, waiting for connections...');
+```javascript
+console.log('Web Server started, waiting for connections...');
+```
 
 Because it's so simple, console.log is by far the most common way of logging data in node.js.
 
@@ -16,26 +18,30 @@ Logging only with functions such as `console.log` is not ideal for every use cas
 
 Here is an example of a basic custom logging module with configurable debugging levels.
 
-      var logger = exports;
-      logger.debugLevel = 'warn';
-      logger.log = function(level, message) {
-        var levels = ['error', 'warn', 'info'];
-        if (levels.indexOf(level) >= levels.indexOf(logger.debugLevel) ) {
-          if (typeof message !== 'string') {
-            message = JSON.stringify(message);
-          };
-          console.log(level+': '+message);
-        }
-      }
+```javascript
+var logger = exports;
+logger.debugLevel = 'warn';
+logger.log = function(level, message) {
+  var levels = ['error', 'warn', 'info'];
+  if (levels.indexOf(level) >= levels.indexOf(logger.debugLevel) ) {
+    if (typeof message !== 'string') {
+      message = JSON.stringify(message);
+    };
+    console.log(level+': '+message);
+  }
+}
+```
 
 Usage would then look like the following:
 
-      var logger = require('./logger');
-      logger.debugLevel = 'warn';
-      logger.log('info', 'Everything started properly.');
-      logger.log('warn', 'Running out of memory...');
-      logger.log('error', { error: 'flagrant'});
-    
+```javascript
+var logger = require('./logger');
+logger.debugLevel = 'warn';
+logger.log('info', 'Everything started properly.');
+logger.log('warn', 'Running out of memory...');
+logger.log('error', { error: 'flagrant'});
+```
+
 Because `logger.debugLevel` was set to `warn`, the warning message and the error would both be displayed, but the `info` message would not be.
 
 The advantage here is that the behavior of our logging mechanisms can now be modified and controlled from a central part of our code. In this case, logging levels were added, and messages are converted to JSON if they aren't already in string form. There is a lot more that could be done here - saving logs to a file, pushing them to a database, setting custom colors and formatting the output - but by the time you want that much functionality from your custom logging function, it might be time to use an already-existing library.
@@ -46,26 +52,30 @@ The advantage here is that the behavior of our logging mechanisms can now be mod
 
 Here is an example of setting up a `winston` logger.  This example includes most of the transports one could ever possibly want - please note that most use cases will only warrant a few of these.
 
-      var winston = require('winston');
+```javascript
+var winston = require('winston');
 
-      require('winston-riak').Riak;
-      require('winston-mongo').Mongo;
-      var logger = new (winston.Logger)({
-        transports: [
-          new winston.transports.Console()
-          new winston.transports.File({ filename: 'path/to/all-logs.log' })
-          new winston.transports.Couchdb({ 'host': 'localhost', 'db': 'logs' })
-          new winston.transports.Riak({ bucket: 'logs' })
-          new winston.transports.MongoDB({ db: 'db', level: 'info'})
-        ]
-        exceptionHandlers: [
-          new winston.transports.File({ filename: 'path/to/exceptions.log' })
-        ]
-      });
+require('winston-riak').Riak;
+require('winston-mongo').Mongo;
+var logger = new (winston.Logger)({
+  transports: [
+    new winston.transports.Console()
+    new winston.transports.File({ filename: 'path/to/all-logs.log' })
+    new winston.transports.Couchdb({ 'host': 'localhost', 'db': 'logs' })
+    new winston.transports.Riak({ bucket: 'logs' })
+    new winston.transports.MongoDB({ db: 'db', level: 'info'})
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({ filename: 'path/to/exceptions.log' })
+  ]
+});
+```
 
 Here, we have instantiated a new `winston` logger, and provided a number of logging transports.  Winston has built-in support for configurable logging levels, and provides alias methods for each configured logging level.  For example, `winston.warn(x)` is an alias for `winston.log('warn', x)`.  Thus, the following:
 
-      logger.warn('Hull Breach Detected on Deck 7!'); 
+```javascript
+logger.warn('Hull Breach Detected on Deck 7!'); 
+```
 
 Would output to the screen:
 
